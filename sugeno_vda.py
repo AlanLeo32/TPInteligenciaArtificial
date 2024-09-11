@@ -9,17 +9,17 @@ def ClusteringSubstractivo(puntos,centros_clusters,N):
     c=0
     #hiperparametros
     Ra=0.6
-    Rb=0.8
+    Rb=0.9
     RR=0.5 #coeficiente de rechazo. Tiene que ser menor que AR? 
     AR=0.7 #coeficiente de aceptacion
     k=0
     for i in range (N):
         for j in range(N):
-            if(i!=j):
-                dist=calcular_distancia(puntos[i],puntos[j])
-                vec_pot[i]+=np.exp(-dist**2/(Ra/2)**2)
+            dist=calcular_distancia(puntos[i],puntos[j])
+            vec_pot[i]+=np.exp(-dist**2/(Ra/2)**2)
     k=np.argmax(vec_pot) # posicion del punto de maximo potencial
     centros_clusters.append(puntos[k]) 
+    
     while(np.max(vec_pot) >= 1e-2):
         Pk=np.max(vec_pot)
         recalcular_potencial(puntos,vec_pot,k,Rb)
@@ -43,10 +43,10 @@ def calcular_distancia(p1, p2):
 def recalcular_potencial(puntos, vec_pot,c, Rb):
     for i in range(len(puntos)):
         dist = calcular_distancia(puntos[i],puntos[c])
-        vec_pot[i] -= vec_pot[i] * vec_pot[c]*np.exp(-(dist**2) / (Rb/2)**2)
+        vec_pot[i] -= vec_pot[c]*np.exp(-(dist**2) / (Rb/2)**2)
         if vec_pot[i]<0:
             vec_pot[i]=0
-
+    return vec_pot
 def distancia_minima(punto,puntos):
 # Encontrar la distancia mínima
     min= float('inf')  # Inicializamos con infinito
@@ -71,6 +71,7 @@ plt.title('Gráfico de Tiempo vs Señal')  # Título del gráfico
 plt.grid(True)  # Mostrar una cuadrícula
 plt.show()  # Mostrar el gráfico
 
+
 #NORMALIZACION DE DATOS
 data = np.array(puntos)
 # Crea una instancia del escalador MinMaxScaler
@@ -83,7 +84,7 @@ scaler.fit(data)
 normalized_data = scaler.transform(data)
 puntos_normalizados = tuple(map(tuple, normalized_data))
 X,Y=zip(*puntos_normalizados)
-puntos = list(zip(X, Y))
+
 plt.plot(X, Y, marker='o')  # marker='o' es para mostrar los puntos, puedes omitirlo si no quieres puntos
 plt.xlabel('Tiempo')  # Etiqueta para el eje X
 plt.ylabel('Señal')  # Etiqueta para el eje Y
@@ -93,5 +94,6 @@ plt.show()  # Mostrar el gráfico
 
 N = len(puntos_normalizados) 
 centros_clusters=[]
+
 ClusteringSubstractivo(puntos_normalizados,centros_clusters,N)
 print(np.float64(centros_clusters))
