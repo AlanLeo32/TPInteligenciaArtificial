@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from scipy.spatial import distance_matrix
+from scipy import interpolate
 
 def subclust2(data, Ra, Rb=0, AcceptRatio=0.3, RejectRatio=0.1):
     if Rb==0:
@@ -90,6 +91,20 @@ r,c = subclust2(m,0.7)
 plt.figure()
 plt.scatter(m[:,0],m[:,1], c=r)
 plt.scatter(c[:,0],c[:,1], marker='X')
+
+# Ejemplo de datos
+x_original = np.linspace(0, 10, 100)  # Puntos de la señal original
+y_original = np.sin(x_original)  # Señal original (por ejemplo, una función seno)
+
+# Crear la función de interpolación spline cúbica
+spline = interpolate.CubicSpline(x_original, y_original)
+
+# Generar puntos adicionales para sobremuestrear
+x_new = np.linspace(0, 10, 1000)  # Aumentar resolución
+y_new = spline(x_new)
+
+# Graficar señal original y sobremuestreada
+plt.plot(x_original, y_original, 'o', label="Original")
+plt.plot(x_new, y_new, '-', label="Sobremuestreada")
+plt.legend()
 plt.show()
-
-
