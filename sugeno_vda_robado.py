@@ -47,8 +47,16 @@ def subclust2(data, Ra, Rb=0, AcceptRatio=0.3, RejectRatio=0.1):
     distancias = [[np.linalg.norm(p-c) for p in ndata] for c in centers]
     labels = np.argmin(distancias, axis=0)
     centers = scaler.inverse_transform(centers)
+    print(centers)
     return labels, centers
 
+def calcular_ecm(data, labels, centers):
+    """Calcula el Error Cuadrático Medio (ECM)"""
+    ecm = 0
+    for i, point in enumerate(data):
+        center = centers[labels[i]]
+        ecm += np.linalg.norm(point - center) ** 2
+    return ecm / len(data)
 
 
 
@@ -58,13 +66,30 @@ with open("samplesVDA1.txt", "r") as file:
 # Genera el array con pares (x, y)
 m = np.array([(0.0025 * i, y) for i, y in enumerate(data)])
 
-# Muestra el resultado
-print(m)
+r_values = np.linspace(0.5, 2.0, 20)  # Rango de valores para Ra
+ecm_values = []
+
+# Calcular ECM para cada valor de Ra
+for Ra in r_values:
+    labels, centers = subclust2(m, Ra)
+    ecm = calcular_ecm(m, labels, centers)
+    ecm_values.append(ecm)
+
+# Graficar ECM vs Ra
+plt.figure()
+plt.plot(r_values, ecm_values, marker='o')
+plt.xlabel("Radio de aceptación (Ra)")
+plt.ylabel("Error cuadrático medio (ECM)")
+plt.title("ECM vs Ra")
+plt.grid(True)
 
 
-r,c = subclust2(m,0.5)
+
+r,c = subclust2(m,0.7)
 
 plt.figure()
 plt.scatter(m[:,0],m[:,1], c=r)
 plt.scatter(c[:,0],c[:,1], marker='X')
 plt.show()
+
+
