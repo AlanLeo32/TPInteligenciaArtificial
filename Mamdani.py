@@ -35,8 +35,8 @@ control_llama = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5])
 simulador_llama = ctrl.ControlSystemSimulation(control_llama)
 
 # Ejemplo de simulación
-simulador_llama.input['temperatura_exterior'] = 29
-simulador_llama.input['temperatura_interior'] = 70
+simulador_llama.input['temperatura_exterior'] = 20
+simulador_llama.input['temperatura_interior'] = 72.5
 
 # Calcular el tamaño de la llama
 simulador_llama.compute()

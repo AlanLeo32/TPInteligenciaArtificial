@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from scipy.spatial import distance_matrix
-from scipy import interpolate
+from sklearn.linear_model import LinearRegression
 
 def subclust2(data, Ra, Rb=0, AcceptRatio=0.3, RejectRatio=0.1):
     if Rb==0:
@@ -59,9 +59,30 @@ def calcular_ecm(data, labels, centers):
         ecm += np.linalg.norm(point - center) ** 2
     return ecm / len(data)
 
+# Regresión lineal por cluster
+def regresion_por_cluster(data, labels, centers):
+    """Realiza una regresión lineal para cada cluster."""
+    unique_labels = np.unique(labels)
+    plt.figure()
+    for label in unique_labels:
+        cluster_data = data[labels == label]  # Filtrar datos del cluster
+        X_cluster = cluster_data[:, 0].reshape(-1, 1)  # Usar la primera columna como X
+        y_cluster = cluster_data[:, 1]  # Usar la segunda columna como y
 
+        # Ajustar modelo de regresión lineal
+        reg = LinearRegression().fit(X_cluster, y_cluster)
+        y_pred = reg.predict(X_cluster)
 
-with open("samplesVDA1.txt", "r") as file:
+        # Graficar puntos del cluster y la regresión lineal
+        plt.scatter(X_cluster, y_cluster, label=f'Cluster {label}')
+        plt.plot(X_cluster, y_pred, label=f'Regresión Cluster {label}', linestyle='--')
+
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Regresiones Lineales por Cluster")
+    plt.legend()
+
+with open("samplesVDA4.txt", "r") as file:
     data = [int(line.strip()) for line in file]
 
 # Genera el array con pares (x, y)
@@ -84,27 +105,14 @@ plt.ylabel("Error cuadrático medio (ECM)")
 plt.title("ECM vs Ra")
 plt.grid(True)
 
-
-
-r,c = subclust2(m,0.7)
+# Obtener clusters y realizar regresiones
+labels, centers = subclust2(m, 1)
 
 plt.figure()
-plt.scatter(m[:,0],m[:,1], c=r)
-plt.scatter(c[:,0],c[:,1], marker='X')
+plt.scatter(m[:,0],m[:,1], c=labels)
+plt.scatter(centers[:,0],centers[:,1], marker='X')
 
-# Ejemplo de datos
-x_original = np.linspace(0, 10, 100)  # Puntos de la señal original
-y_original = np.sin(x_original)  # Señal original (por ejemplo, una función seno)
 
-# Crear la función de interpolación spline cúbica
-spline = interpolate.CubicSpline(x_original, y_original)
-
-# Generar puntos adicionales para sobremuestrear
-x_new = np.linspace(0, 10, 1000)  # Aumentar resolución
-y_new = spline(x_new)
-
-# Graficar señal original y sobremuestreada
-plt.plot(x_original, y_original, 'o', label="Original")
-plt.plot(x_new, y_new, '-', label="Sobremuestreada")
-plt.legend()
+# Realizar regresiones por cluster
+regresion_por_cluster(m, labels, centers)
 plt.show()
