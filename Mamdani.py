@@ -34,11 +34,23 @@ rule5 = ctrl.Rule(temperatura_interior['critica'], llama['piloto'])
 control_llama = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5])
 simulador_llama = ctrl.ControlSystemSimulation(control_llama)
 
+#media del max
+#llama.defuzzify_method = 'mom'
+
+#bisector
+#llama.defuzzify_method = 'bisector'
+
+#menor del max
+#llama.defuzzify_method = 'som'
+#max del max
+llama.defuzzify_method = 'lom'
 # Ejemplo de simulación
-simulador_llama.input['temperatura_exterior'] = 30
-simulador_llama.input['temperatura_interior'] = 120
+
+simulador_llama.input['temperatura_exterior'] = 20
+simulador_llama.input['temperatura_interior'] = 72.5
 
 # Calcular el tamaño de la llama
+
 simulador_llama.compute()
 print(f"Tamaño de la llama: {simulador_llama.output['llama']:.2f}")
 
