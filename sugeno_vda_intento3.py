@@ -3,51 +3,6 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from scipy.spatial import distance_matrix
 
-
-
-data_y=np.loadtxt("samplesVDA3.txt")
-
-
-# Frecuencia de muestreo
-sample_frequency = 400  # Hz
-
-# Intervalo entre muestras en segundos
-sample_interval = 1 / sample_frequency  # 2.5 ms
-
-# Crear un arreglo de tiempo en segundos
-data_x = np.arange(0, len(data_y) * sample_interval, sample_interval)
-
-plt.plot(data_x,data_y)
-plt.xlabel('Tiempo (s)')
-plt.ylabel('Señal VDA')
-plt.title('Gráfico de la Señal VDA en función del Tiempo')
-plt.grid(True)
-plt.show()
-
-data = np.vstack((data_x,data_y)).T
-# Graficar los datos en función del tiempo
-
-#--------------------------------------------
-# Crea una instancia del escalador MinMaxScaler
-scaler = MinMaxScaler()
-
-# Ajusta (fit) el escalador a tus datos para aprender los parámetros de la transformación
-scaler.fit(data)
-
-# Luego, puedes usar el método transform para normalizar tus datos
-normalized_data = scaler.transform(data)
-
-
-
-#--------------------------------------------
-plt.plot(normalized_data[:,0],normalized_data[:,1])
-plt.xlabel('Tiempo (s)')
-plt.ylabel('Señal VDA')
-plt.title('Gráfico de la Señal VDA en función del Tiempo')
-plt.grid(True)
-plt.show()
-
-
 def subclust2(data, Ra, Rb=0.3, AcceptRatio=0.3, RejectRatio=0.1):
     if Rb==0:
         Rb = Ra*1.15
@@ -198,6 +153,49 @@ class fis:
 
 
 
+
+data_y=np.loadtxt("samplesVDA1.txt")
+
+
+# Frecuencia de muestreo
+sample_frequency = 400  # Hz
+
+# Intervalo entre muestras en segundos
+sample_interval = 1 / sample_frequency  # 2.5 ms
+
+# Crear un arreglo de tiempo en segundos
+data_x = np.arange(0, len(data_y) * sample_interval, sample_interval)
+
+plt.plot(data_x,data_y)
+plt.xlabel('Tiempo (s)')
+plt.ylabel('Señal VDA')
+plt.title('Gráfico de la Señal VDA en función del Tiempo')
+plt.grid(True)
+plt.show()
+
+data = np.vstack((data_x,data_y)).T
+# Graficar los datos en función del tiempo
+
+#--------------------------------------------
+# Crea una instancia del escalador MinMaxScaler
+scaler = MinMaxScaler()
+
+# Ajusta (fit) el escalador a tus datos para aprender los parámetros de la transformación
+scaler.fit(data)
+
+# Luego, puedes usar el método transform para normalizar tus datos
+normalized_data = scaler.transform(data)
+
+
+
+#--------------------------------------------
+plt.plot(normalized_data[:,0],normalized_data[:,1])
+plt.xlabel('Tiempo (s)')
+plt.ylabel('Señal VDA')
+plt.title('Gráfico de la Señal VDA en función del Tiempo')
+plt.grid(True)
+plt.show()
+
 # Crea una instancia de la clase 'fis'
 fis2 = fis()
 
@@ -206,8 +204,10 @@ MseHistorial = np.array([])
 msea=999;
 a=0
 # Llama a la función 'genfis' para generar el modelo Sugeno (ajusta el valor de 'radii' según tus necesidades)
-val=[0.01,0.03,0.05,0.07,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6]
+val = np.linspace(0.01, 5.0, 10)
+
 for i in val:
+  print(val)
   reglas=np.append(reglas,fis2.genfis(data,i))
   r = fis2.evalfis(np.vstack(data_x))
   # Calcula las diferencias entre las predicciones y los valores reales
@@ -218,7 +218,6 @@ for i in val:
 
   # Calcula el MSE como el promedio de las diferencias al cuadrado
   mse = np.mean(diferencias_al_cuadrado)
-  print(reglas)
   MseHistorial=np.append(MseHistorial,mse)
 
 #--------------------------------------------------------------------------
@@ -246,6 +245,7 @@ puntaje_combinado= np.array([])
 for i in range(0,len(reglas),1):
   # Calcula el puntaje combinado para cada modelo
   puntaje_combinado=np.append(puntaje_combinado, peso_reglas * reglas[i] + peso_mse * MseHistorial[i])
+  print("Reglas:", reglas[i],"Mejor modelo - MSE:", MseHistorial[i])
 
 # Encuentra el índice del modelo con el puntaje combinado más bajo
 mejor_modelo_indice = np.argmin(puntaje_combinado)
