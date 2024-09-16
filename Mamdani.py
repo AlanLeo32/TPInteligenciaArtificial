@@ -9,17 +9,17 @@ temperatura_interior = ctrl.Antecedent(np.arange(50, 101, 1), 'temperatura_inter
 llama = ctrl.Consequent(np.arange(0, 101, 1), 'llama')
 
 # Funciones de pertenencia para la temperatura exterior
-temperatura_exterior['baja'] = fuzz.trimf(temperatura_exterior.universe, [0, 0, 30])
-temperatura_exterior['media'] = fuzz.trimf(temperatura_exterior.universe, [10, 30, 50])
-temperatura_exterior['alta'] = fuzz.trimf(temperatura_exterior.universe, [30, 50, 50])
+temperatura_exterior['baja'] = fuzz.trimf(temperatura_exterior.universe, [0, 0, 15])
+temperatura_exterior['media'] = fuzz.trimf(temperatura_exterior.universe, [10, 15, 30])
+temperatura_exterior['alta'] = fuzz.trimf(temperatura_exterior.universe, [20, 50, 50])
 
 # Funciones de pertenencia para la temperatura interior
 temperatura_interior['normal'] = fuzz.trimf(temperatura_interior.universe, [50, 50, 75])
 temperatura_interior['alta'] = fuzz.trimf(temperatura_interior.universe, [70, 80, 90])
-temperatura_interior['critica'] = fuzz.trimf(temperatura_interior.universe, [85, 100, 100])
+temperatura_interior['critica'] = fuzz.trimf(temperatura_interior.universe, [70, 100, 100])
 
 # Funciones de pertenencia para el tamaño de la llama (combustión)
-llama['piloto'] = fuzz.trimf(llama.universe, [0, 0, 40])
+llama['piloto'] = fuzz.trimf(llama.universe, [0, 0, 50])
 llama['moderada'] = fuzz.trimf(llama.universe, [20, 50, 80])
 llama['alta'] = fuzz.trimf(llama.universe, [60, 100, 100])
 
@@ -43,11 +43,11 @@ simulador_llama = ctrl.ControlSystemSimulation(control_llama)
 #menor del max
 #llama.defuzzify_method = 'som'
 #max del max
-llama.defuzzify_method = 'lom'
+llama.defuzzify_method = 'centroid'
 # Ejemplo de simulación
 
-simulador_llama.input['temperatura_exterior'] = 20
-simulador_llama.input['temperatura_interior'] = 72.5
+simulador_llama.input['temperatura_exterior'] = 0
+simulador_llama.input['temperatura_interior'] = 100
 
 # Calcular el tamaño de la llama
 
